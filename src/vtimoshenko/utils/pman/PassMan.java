@@ -19,6 +19,16 @@ public class PassMan {
         currentNode = "";
     }
 
+    /**
+     * создание пароля
+     *
+     *
+     * @param node
+     * @param username
+     * @param password
+     * @param overwrite
+     * @return
+     */
     public String newPass(String node, String username, String password, boolean overwrite){
         StringBuffer buf = new StringBuffer();
         if (!nodes.containsKey(node)){
@@ -37,12 +47,14 @@ public class PassMan {
         return buf.toString();
     }
 
-    public String listPass(String node){
+
+    public String listPass(String node, boolean recursive){
         StringBuffer buf = new StringBuffer();
         ArrayList<String> results = new ArrayList<>();
         nodes.forEach((nk, nv) -> {
             nv.getUsers().forEach((uk, uv) -> {
-                if (nk.startsWith(currentNode)) results.add(nk.substring(currentNode.length()) + "\t" + uk);
+                if (nk.startsWith(currentNode + "/" + node))
+                    results.add(nk.substring(currentNode.length()) + "\t" + uk);
             });
         });
         Collections.sort(results);
@@ -50,6 +62,13 @@ public class PassMan {
         return buf.toString();
     }
 
+    /**
+     * получение пароля
+     *
+     * @param node
+     * @param user
+     * @return
+     */
     public String getPass(String node, String user){
         StringBuffer buf = new StringBuffer();
         if (!nodes.containsKey(currentNode + "/" + node))
