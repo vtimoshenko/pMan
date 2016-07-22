@@ -4,15 +4,15 @@ package vtimoshenko.utils.pman.entity;
  * Created by vtimoshenko on 14.07.2016.
  */
 public class Label {
-    private String name;
+    private String system;
     private String comment;
 
-    public String getName() {
-        return name;
+    public String getSystem() {
+        return system;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSystem(String name) {
+        this.system = name;
     }
 
     public String getComment() {
