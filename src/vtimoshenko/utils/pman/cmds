@@ -1,0 +1,24 @@
+pman file masterpass
+
+list
+    all subnodes
+list -r
+    all subnodes with recursive
+
+pass node user pass
+    - create pass
+pass user:pass@node
+    - create pass
+pass user@node
+    - show pass
+pass node
+    - list users
+pass node -p
+    - list users with passwords
+
+c ..
+    level up
+c node
+    level down
+c
+    current level
