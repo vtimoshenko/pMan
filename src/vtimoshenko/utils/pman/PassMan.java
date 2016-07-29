@@ -1,5 +1,6 @@
 package vtimoshenko.utils.pman;
 
+import com.sun.org.apache.xalan.internal.xsltc.dom.CurrentNodeListFilter;
 import vtimoshenko.utils.pman.entity.Node;
 import vtimoshenko.utils.pman.entity.User;
 
@@ -16,7 +17,7 @@ public class PassMan {
 
     public PassMan() {
         this.nodes = new HashMap<>();
-        currentNode = "";
+        currentNode = "/";
     }
 
     /**
@@ -80,4 +81,22 @@ public class PassMan {
         return buf.toString();
     }
 
+    public String changeNode(String node){
+        StringBuffer buf = new StringBuffer();
+        if (node.equals("..")){
+            if (currentNode.equals("/")) buf.append("you are in /");
+            else {
+                currentNode = currentNode.substring(0, currentNode.lastIndexOf('/'));
+            }
+        }
+        else if (node.equals("")){
+            buf.append(currentNode);
+        }
+        else {
+            String newCNode = currentNode + "/" + node;
+            if (nodes.containsKey(newCNode)) currentNode = newCNode;
+            else buf.append("node " + newCNode + " nof found");
+        }
+        return buf.toString();
+    }
 }
