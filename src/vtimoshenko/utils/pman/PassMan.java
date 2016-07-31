@@ -44,19 +44,44 @@ public class PassMan {
             nod.getUser(username).setPassword(password);
             buf.append("user " + username + " changed\n"); }
         else
-            buf.append("user " + username + " alredy exist. Use -o for overwrite.\n");
+            buf.append("user " + username + " alredy exist. Use -r for replace.\n");
         return buf.toString();
     }
 
 
-    public String listPass(String node, boolean recursive){
+    public String listPass(String node, boolean recursive, boolean withpass){
         StringBuffer buf = new StringBuffer();
+
+        String targetNode;
+        if (node.equals("")) targetNode = currentNode;
+        else targetNode = currentNode + "/" + node;
+
         ArrayList<String> results = new ArrayList<>();
         nodes.forEach((nk, nv) -> {
             nv.getUsers().forEach((uk, uv) -> {
-                if (nk.startsWith(currentNode + "/" + node))
-                    results.add(nk.substring(currentNode.length()) + "\t" + uk);
+                if ((nk.startsWith(targetNode) && recursive) || (nk.equals(targetNode) && !recursive))
+                    if (withpass)
+                        results.add(nk.substring(currentNode.length()) + "\t" + uk + "/" + uv);
+                    else
+                        results.add(nk.substring(currentNode.length()) + "\t" + uk);
             });
+        });
+        Collections.sort(results);
+        for (String a : results) buf.append(a + "\n");
+        return buf.toString();
+    }
+
+    public String listNodes(String node, boolean recursive){
+        StringBuffer buf = new StringBuffer();
+
+        String targetNode;
+        if (node.equals("")) targetNode = currentNode;
+        else targetNode = currentNode + "/" + node;
+
+        ArrayList<String> results = new ArrayList<>();
+        nodes.forEach((nk, nv) -> {
+                if ((nk.startsWith(targetNode) && recursive) || (nk.equals(targetNode) && !recursive))
+                        results.add(nk.substring(currentNode.length()));
         });
         Collections.sort(results);
         for (String a : results) buf.append(a + "\n");
@@ -72,12 +97,17 @@ public class PassMan {
      */
     public String getPass(String node, String user){
         StringBuffer buf = new StringBuffer();
-        if (!nodes.containsKey(currentNode + "/" + node))
+
+        String targetNode;
+        if (node.equals("")) targetNode = currentNode;
+        else targetNode = currentNode + "/" + node;
+
+        if (!nodes.containsKey(targetNode))
             buf.append("node not found");
-        else if (!nodes.get(currentNode + "/" + node).existUser(user))
+        else if (!nodes.get(targetNode).existUser(user))
             buf.append("user not found");
         else
-            buf.append("pass: " + nodes.get(currentNode + "/" + node).getUser(user).getPassword());
+            buf.append("pass: " + nodes.get(targetNode).getUser(user).getPassword());
         return buf.toString();
     }
 

@@ -1,28 +1,30 @@
 pman file masterpass
 ----------------------
-list
+list                        *
     all subnodes
-list -r
+list -r                     *
     all subnodes with recursive
 ----------------------
 pass  node user pass        *
-    - create pass           *
+    - create pass
 pass user:pass@node         *
-    - create pass           *
+    - create pass
  -r                         *
-    - rewrite if need       *
+    - rewrite if need
 ----------------------
 pass user@node              *
-    - show pass             *
-pass node
+    - show pass
+pass node                   *
     - list users
-pass node -p
+ -p                         *
     - list users with passwords
+ -r                         *
+    - recursive (show with subnodes)
 ----------------------
-c ..
+c ..                        *
     level up
-c node
+c node                      *
     level down
-c
+c                           *
     current level
 ----------------------
