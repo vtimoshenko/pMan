@@ -1,6 +1,5 @@
 package vtimoshenko.utils.pman;
 
-import com.sun.org.apache.xalan.internal.xsltc.dom.CurrentNodeListFilter;
 import vtimoshenko.utils.pman.entity.Node;
 import vtimoshenko.utils.pman.entity.User;
 
@@ -32,19 +31,25 @@ public class PassMan {
      */
     public String newPass(String node, String username, String password, boolean overwrite){
         StringBuffer buf = new StringBuffer();
-        if (!nodes.containsKey(node)){
-            nodes.put(node, new Node(node));
-            buf.append("node " + node + " created\n");
+
+        String targetNode;
+        if (node.equals("")) targetNode = currentNode;
+        else if (currentNode.equals("/")) targetNode = currentNode + node;
+        else targetNode = currentNode + "/" + node;
+
+        if (!nodes.containsKey(targetNode)){
+            nodes.put(targetNode, new Node(targetNode));
+            buf.append("node " + targetNode + " created\n");
         }
-        Node nod = nodes.get(node);
+        Node nod = nodes.get(targetNode);
         if (!nod.existUser(username)) {
             nod.setUser(new User(username, password));
-            buf.append("user " + username + " created\n"); }
+            buf.append("user " + username + " created"); }
         else if (overwrite) {
             nod.getUser(username).setPassword(password);
-            buf.append("user " + username + " changed\n"); }
+            buf.append("user " + username + " changed"); }
         else
-            buf.append("user " + username + " alredy exist. Use -r for replace.\n");
+            buf.append("user " + username + " alredy exist. Use -r for replace.");
         return buf.toString();
     }
 
@@ -54,6 +59,7 @@ public class PassMan {
 
         String targetNode;
         if (node.equals("")) targetNode = currentNode;
+        else if (currentNode.equals("/")) targetNode = currentNode + node;
         else targetNode = currentNode + "/" + node;
 
         ArrayList<String> results = new ArrayList<>();
@@ -61,7 +67,7 @@ public class PassMan {
             nv.getUsers().forEach((uk, uv) -> {
                 if ((nk.startsWith(targetNode) && recursive) || (nk.equals(targetNode) && !recursive))
                     if (withpass)
-                        results.add(nk.substring(currentNode.length()) + "\t" + uk + "/" + uv);
+                        results.add(nk.substring(currentNode.length()) + "\t" + uk + "/" + uv.getPassword());
                     else
                         results.add(nk.substring(currentNode.length()) + "\t" + uk);
             });
@@ -76,11 +82,12 @@ public class PassMan {
 
         String targetNode;
         if (node.equals("")) targetNode = currentNode;
+        else if (currentNode.equals("/")) targetNode = currentNode + node;
         else targetNode = currentNode + "/" + node;
 
         ArrayList<String> results = new ArrayList<>();
         nodes.forEach((nk, nv) -> {
-                if ((nk.startsWith(targetNode) && recursive) || (nk.equals(targetNode) && !recursive))
+                if ((nk.startsWith(targetNode) && recursive) || (nk.startsWith(targetNode) && !recursive && nk.substring(targetNode.length()).indexOf('/')<0))
                         results.add(nk.substring(currentNode.length()));
         });
         Collections.sort(results);
@@ -100,6 +107,7 @@ public class PassMan {
 
         String targetNode;
         if (node.equals("")) targetNode = currentNode;
+        else if (currentNode.equals("/")) targetNode = currentNode + node;
         else targetNode = currentNode + "/" + node;
 
         if (!nodes.containsKey(targetNode))
@@ -114,19 +122,41 @@ public class PassMan {
     public String changeNode(String node){
         StringBuffer buf = new StringBuffer();
         if (node.equals("..")){
-            if (currentNode.equals("/")) buf.append("you are in /");
+            if (currentNode.equals("/")) buf.append(currentNode);
             else {
                 currentNode = currentNode.substring(0, currentNode.lastIndexOf('/'));
+                if (currentNode.equals("")) currentNode = "/";
+                buf.append(currentNode);
             }
         }
         else if (node.equals("")){
             buf.append(currentNode);
         }
         else {
-            String newCNode = currentNode + "/" + node;
-            if (nodes.containsKey(newCNode)) currentNode = newCNode;
-            else buf.append("node " + newCNode + " nof found");
+            String newCNode;
+            if (currentNode.equals("/")) newCNode = currentNode + node;
+            else newCNode = currentNode + "/" + node;
+
+            nodes.forEach((nk, nv) -> {
+                if ((nk.startsWith(newCNode + "/"))){
+                    currentNode = newCNode;
+                }
+            });
+            buf.append(currentNode);
         }
+        return buf.toString();
+    }
+
+    public String debug(){
+        StringBuffer buf = new StringBuffer();
+        ArrayList<String> results = new ArrayList<>();
+        nodes.forEach((nk, nv) -> {
+            nv.getUsers().forEach((uk, uv) -> {
+                results.add(nk + "\t" + uk + "/" + uv.getPassword());
+            });
+        });
+        Collections.sort(results);
+        for (String a : results) buf.append(a + "\n");
         return buf.toString();
     }
 }

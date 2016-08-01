@@ -5,26 +5,26 @@ list                        *
 list -r                     *
     all subnodes with recursive
 ----------------------
-pass  node user pass        *
+pass  node user pass        *+
     - create pass
-pass user:pass@node         *
+pass user:pass@node         *+
     - create pass
- -r                         *
+ -r                         *+
     - rewrite if need
 ----------------------
-pass user@node              *
+pass user@node              *+
     - show pass
-pass node                   *
+pass node                   *+
     - list users
- -p                         *
+ -p                         *+
     - list users with passwords
- -r                         *
+ -r                         *+
     - recursive (show with subnodes)
 ----------------------
-c ..                        *
+c ..                        *+-
     level up
-c node                      *
+c node                      *+-
     level down
-c                           *
+c                           *+-
     current level
 ----------------------
